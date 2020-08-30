@@ -1,34 +1,27 @@
-const request = require('request')
 const urls = require('./urls/url')
+const geocode = require('./utils/geocode')
+const forecast = require('./utils/forecast')
 
 
-const wUrl = urls.weatherStackUrl()
+const place =  process.argv[2]
 
 
-request({url:wUrl,json:true},(error,response)=>{
+if(!place){
+ console.log('please provide a valid place macha');
+}else{
+  geocode(place,(error,data)=>{
     if(error){
-      console.log('Unable to connect to server');
-    }else if(response.body.error){
-      console.log('Please provide a valid location');
-    }else{
-      const data = response.body.current
-      console.log(data.weather_descriptions+'. It is currently  ' +data.temperature + ' degrees out. it is feel like  ' +data.feelslike+ '  degrees out');
+      return console.log(error);
     }
-  
-})
-
-const mUrl = urls.mapBoxUrl()
-request({url:mUrl,json:true},(error,response)=>{
-    if(error){
-          console.log('can\'t connect to server ');
-    }else if(response.body.features.length === 0){
-          console.log('oops! No location found');
-    }else{
-        const longitude = response.body.features[0].center[0]
-        const latitude = response.body.features[0].center[1]
-         console.log('latitude: '+latitude  +'  longitude:  ' + longitude)
-    }
-    
+    forecast( data.latitude,data.longitude, (error, forecastData) => {
+      if(error){
+        return console.log(error);
+      }
+     console.log(data.location);
+     console.log(forecastData);
+    })
+  })
 }
-)
+
+
 
