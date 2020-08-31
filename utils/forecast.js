@@ -2,14 +2,14 @@ const request = require('request')
 const urls = require('../urls/url')
 const forecast = (latitude,longitude,callback)=>{
     const url = urls.weatherStackUrl(latitude,longitude)
-    request({url:url ,json:true},(error,response)=>{
+    request({url,json:true},(error,{body})=>{
           if(error){
            callback('No connection',undefined)
-          }else if(response.body.error){
+          }else if(body.error){
             callback('please provide a valid location',undefined)
           }else{
-            const data = response.body.current
-            const str = data.weather_descriptions+'. It is currently  ' +data.temperature + ' degrees out. it is feel like  ' +data.feelslike+ '  degrees out'
+            const {weather_descriptions,temperature,feelslike} =body.current
+            const str = weather_descriptions+'. It is currently  ' +temperature + ' degrees out. it is feel like  ' +feelslike+ '  degrees out'
             callback(undefined,str)
           }
     })
